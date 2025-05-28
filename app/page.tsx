@@ -49,18 +49,10 @@ export default function GhibliAI() {
     setIsGenerating(true)
     setProgress(0)
 
-    // 模拟进度条
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(progressInterval)
-          return 90
-        }
-        return prev + Math.random() * 15
-      })
-    }, 500)
-
     try {
+      // 真实进度反馈：开始API调用
+      setProgress(10)
+      
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: {
@@ -73,9 +65,15 @@ export default function GhibliAI() {
         }),
       })
 
+      // API响应接收完成
+      setProgress(60)
+
       const data = await response.json()
 
       if (data.success) {
+        // 开始处理响应数据
+        setProgress(80)
+        
         const newImage: GeneratedImage = {
           id: Date.now().toString(),
           url: data.imageUrl,
@@ -87,10 +85,12 @@ export default function GhibliAI() {
         setCurrentImage(newImage)
 
         // 保存到 localStorage
+        setProgress(90)
         const savedImages = JSON.parse(localStorage.getItem("ghibli-images") || "[]")
         savedImages.unshift(newImage)
         localStorage.setItem("ghibli-images", JSON.stringify(savedImages.slice(0, 20))) // 只保存最近20张
 
+        // 完成
         setProgress(100)
       } else {
         throw new Error(data.error)
@@ -98,10 +98,11 @@ export default function GhibliAI() {
     } catch (error) {
       console.error("生成失败:", error)
       alert("图片生成失败，请稍后重试")
+      setProgress(0)
     } finally {
-      clearInterval(progressInterval)
       setIsGenerating(false)
-      setTimeout(() => setProgress(0), 2000)
+      // 3秒后重置进度条
+      setTimeout(() => setProgress(0), 3000)
     }
   }
 
