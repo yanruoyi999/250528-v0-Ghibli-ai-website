@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gemini-2.5-pro-preview-03-25",
+        model: "dall-e-3",
         prompt: ghibliPrompt,
         n: 1,
         size:
